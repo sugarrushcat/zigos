@@ -172,69 +172,34 @@
 <div id="acoes" class="section">
     <div class="card">
         <div class="card-header"><h2>Registro de Ação</h2></div>
-        <div class="row">
-            <div class="col form-group">
-                <label>Local da Ação</label>
-                <select id="acao-tipo" onchange="app.checkAcaoTipo()">
-                    <option value="" disabled selected>Selecione a ação...</option>
-                    <optgroup label="Lojas e Estabelecimentos">
-                        <option>Barbearia</option>
-                        <option>Loja de Armamentos</option>
-                        <option>Loja de Departamento</option>
-                        <option>Açougue</option>
-                        <option>Loja Samir (Bebidas)</option>
-                        <option>Atom</option>
-                        <option>Planet</option>
-                    </optgroup>
-                    <optgroup label="Bancos e Joalheria">
-                        <option>Banco Fleeca</option>
-                        <option>Banco Central</option>
-                        <option>Joalheria</option>
-                        <option>Nióbio</option>
-                    </optgroup>
-                    <optgroup label="Rua e Veículos">
-                        <option>Ações de Rua (PvP)</option>
-                        <option>Fuga Limpa / Teti-Chão</option>
-                        <option>Corrida Ilegal</option>
-                        <option>Boosting</option>
-                        <option>Roubo de Veículos / Porta-malas</option>
-                        <option>Recuperação de Veículo</option>
-                    </optgroup>
-                    <optgroup label="Drogas e Roubos Menores">
-                        <option>Mesa de Drogas</option>
-                        <option>Tráfico de Drogas</option>
-                        <option>ATM / Registradora / Residência</option>
-                        <option>Caixa de correio</option>
-                    </optgroup>
-                    <optgroup label="Outros e Especiais">
-                        <option>Observatório</option>
-                        <option>Auditório</option>
-                        <option>Campo de Golf</option>
-                        <option>Mergulhador</option>
-                        <option>Helicrash</option>
-                        <option>Sequestro / Refém / Negociação</option>
-                    </optgroup>
-                    <optgroup label="Ações de Férias (Temporário)">
-                        <option>Hotel Abandonado</option>
-                        <option>Cemitério</option>
-                        <option>Motoclube</option>
-                        <option>Galinheiro</option>
-                        <option>Madeireira</option>
-                        <option>Banco de Paleto</option>
-                        <option>Aeroporto Abandonado</option>
-                    </optgroup>
-                    <optgroup label="Personalizado">
-                        <option value="Outro">Outro (Digitar...)</option>
-                    </optgroup>
-                </select>
-                <input type="text" id="acao-tipo-custom" class="hidden mt-15" placeholder="Digite o nome da ação..." autocomplete="off">
+        <div class="form-group">
+            <label>Buscar Ação</label>
+            <input type="text" id="acao-search" placeholder="Digite o nome da ação..." autocomplete="off">
+        </div>
+        <div class="action-picker-wrap">
+            <div class="rules-headline-row">
+                <h3>Resultados</h3>
+                <button id="acao-show-all" class="btn-mini-ghost" type="button" onclick="app.toggleShowAllActions()">Mostrar todas</button>
             </div>
-            <div class="col form-group">
-                <label>Resultado</label>
-                <div class="radio-group">
-                    <label><input type="radio" name="resultado" value="Vitória"><div class="radio-label label-win">Vitória</div></label>
-                    <label><input type="radio" name="resultado" value="Derrota"><div class="radio-label label-loss">Derrota</div></label>
-                </div>
+            <p id="acao-helper" class="rules-helper-text">Digite para filtrar ou abra a lista completa só quando precisar.</p>
+            <div id="acao-action-list" class="rule-action-list"></div>
+            <p id="acao-empty" class="empty-msg" style="display: none;">Nenhuma ação encontrada com esse filtro.</p>
+        </div>
+        <div class="action-picker-wrap">
+            <div class="rules-headline-row">
+                <h3>Ação Selecionada</h3>
+                <span class="rules-headline-sub">Clique em uma ação da lista para preencher o registro.</span>
+            </div>
+            <div id="acao-selected-display" class="selected-action-display">Nenhuma ação selecionada.</div>
+        </div>
+        <select id="acao-tipo" class="hidden">
+            <option value="" disabled selected>Selecione a ação...</option>
+        </select>
+        <div class="form-group">
+            <label>Resultado</label>
+            <div class="radio-group">
+                <label><input type="radio" name="resultado" value="Vitória"><div class="radio-label label-win">Vitória</div></label>
+                <label><input type="radio" name="resultado" value="Derrota"><div class="radio-label label-loss">Derrota</div></label>
             </div>
         </div>
         <div class="row">
@@ -243,10 +208,10 @@
         </div>
         <div class="form-group">
             <label>Participantes</label>
-            <div class="input-group" id="group-participantes">
-                <input type="text" id="novo-participante" placeholder="Nome/ID e Enter..." autocomplete="off" onkeypress="app.handleEnterParticipant(event)">
-                <button class="btn btn-small" type="button" onclick="app.addParticipant()">Add</button>
-            </div>
+            <input type="text" id="novo-participante" placeholder="Digite passaporte ou nome..." autocomplete="off" onkeypress="app.handleEnterParticipant(event)">
+            <div id="participant-action-list" class="participant-suggestion-list mt-15"></div>
+            <p id="participant-empty" class="rules-helper-text" style="display: none;">Nenhum participante encontrado. Use a opção manual abaixo.</p>
+            <button class="btn btn-secondary mt-15" type="button" onclick="app.addParticipant()">Adicionar Manualmente</button>
             <div id="lista-participantes" class="participants-list"></div>
         </div>
         <button class="btn btn-primary" onclick="app.sendActionWebhook()">Enviar Registro</button>
@@ -256,59 +221,47 @@
 <div id="regras" class="section">
     <div class="card max-w-600 mx-auto" style="margin-bottom: 25px;">
         <h2 style="margin-bottom: 20px; color: var(--primary); text-align: center;">Consultar Regras da Ação</h2>
-        <p class="text-center text-muted mb-15 text-sub">Selecione o local para ver o perímetro, limites e cartões de acesso.</p>
-        
-        <div class="form-group">
-            <select id="regras-acao-tipo" onchange="app.checkRegrasTipo()">
-                <option value="" disabled selected>Selecione a ação para consultar...</option>
-                <optgroup label="Lojas e Estabelecimentos">
-                    <option>Barbearia</option>
-                    <option>Loja de Armamentos</option>
-                    <option>Loja de Departamento</option>
-                    <option>Açougue</option>
-                    <option>Loja Samir (Bebidas)</option>
-                    <option>Atom</option>
-                    <option>Planet</option>
-                </optgroup>
-                <optgroup label="Bancos e Joalheria">
-                    <option>Banco Fleeca</option>
-                    <option>Banco Central</option>
-                    <option>Joalheria</option>
-                    <option>Nióbio</option>
-                </optgroup>
-                <optgroup label="Rua e Veículos">
-                    <option>Ações de Rua (PvP)</option>
-                    <option>Fuga Limpa / Teti-Chão</option>
-                    <option>Corrida Ilegal</option>
-                    <option>Boosting</option>
-                    <option>Roubo de Veículos / Porta-malas</option>
-                    <option>Recuperação de Veículo</option>
-                </optgroup>
-                <optgroup label="Drogas e Roubos Menores">
-                    <option>Mesa de Drogas</option>
-                    <option>Tráfico de Drogas</option>
-                    <option>ATM / Registradora / Residência</option>
-                    <option>Caixa de correio</option>
-                </optgroup>
-                <optgroup label="Outros e Especiais">
-                    <option>Observatório</option>
-                    <option>Auditório</option>
-                    <option>Campo de Golf</option>
-                    <option>Mergulhador</option>
-                    <option>Helicrash</option>
-                    <option>Sequestro / Refém / Negociação</option>
-                </optgroup>
-                <optgroup label="Ações de Férias (Temporário)">
-                    <option>Hotel Abandonado</option>
-                    <option>Cemitério</option>
-                    <option>Motoclube</option>
-                    <option>Galinheiro</option>
-                    <option>Madeireira</option>
-                    <option>Banco de Paleto</option>
-                    <option>Aeroporto Abandonado</option>
-                </optgroup>
-            </select>
+        <p class="text-center text-muted mb-15 text-sub">Busque, filtre e salve favoritos para consultar rápido perímetro, limites e cartões de acesso.</p>
+
+        <div class="rules-toolbar">
+            <div class="form-group mb-15">
+                <label>Busca rápida</label>
+                <input type="text" id="regras-search" placeholder="Digite o nome da ação..." autocomplete="off">
+            </div>
+            <div class="form-group mb-15">
+                <label>Escolha direta</label>
+                <select id="regras-acao-tipo">
+                    <option value="" disabled selected>Escolha uma ação...</option>
+                </select>
+            </div>
         </div>
+
+        <div class="rules-favorites-wrap">
+            <div class="rules-headline-row">
+                <h3>Favoritos</h3>
+                <span class="rules-headline-sub">As ações que você mais usa ficam guardadas aqui.</span>
+            </div>
+            <div id="regras-favorites" class="favorite-chip-list"></div>
+        </div>
+
+        <div class="rules-favorites-wrap">
+            <div class="rules-headline-row">
+                <h3>Recentes</h3>
+                <span class="rules-headline-sub">Consultas recentes para abrir mais rápido.</span>
+            </div>
+            <div id="regras-recent" class="favorite-chip-list"></div>
+        </div>
+
+        <div class="rules-results-wrap">
+            <div class="rules-headline-row">
+                <h3>Resultados</h3>
+                <button id="regras-show-all" class="btn-mini-ghost" type="button" onclick="app.toggleShowAllRules()">Mostrar todas</button>
+            </div>
+            <p id="regras-helper" class="rules-helper-text">Digite para buscar uma ação ou use os favoritos e recentes. A lista completa fica recolhida para não poluir a tela.</p>
+            <div id="regras-action-list" class="rule-action-list"></div>
+            <p id="regras-empty" class="empty-msg" style="display: none;">Nenhuma ação encontrada com esse filtro.</p>
+        </div>
+
         <div id="acao-info-regras" class="hidden"></div>
     </div>
 </div>
@@ -355,6 +308,7 @@ LAVAGEM ON: Não é ficção científica. É só nossa lavagem alienígena mesmo
 </div>
 
 <div id="toast-container"></div>
+<script src="actions-data.js?v=1.0"></script>
 <script src="script.js?v=1.8"></script>
 </body>
 </html>
