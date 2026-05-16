@@ -5,14 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>Painel Zigos - Gestão</title>
-    <link rel="stylesheet" href="style.css?v=1.6">
+    <link rel="stylesheet" href="style.css?v=1.8">
 </head>
 <body>
 
 <header>
     <div class="header-top">
-        <h1>Painel Zigos <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal; vertical-align: middle; letter-spacing: 0;">v1.6</span></h1>
+        <h1>Painel Zigos <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal; vertical-align: middle; letter-spacing: 0;">v1.8</span></h1>
         <div class="header-controls">
+            <button id="theme-toggle" class="theme-btn" title="Alternar Tema" style="background: none; border: none; cursor: pointer; font-size: 1.2rem; margin-right: 15px;">
+                <span class="icon-sun">☀️</span>
+                <span class="icon-moon" style="display: none;">🌙</span>
+            </button>
             <div id="btn-admin-secret" class="system-status" onclick="app.toggleAdmin()" title="Clique para liberar acesso Admin">
                 <span class="status-dot"></span> Sistema Online
             </div>
@@ -173,7 +177,6 @@
                 <label>Local da Ação</label>
                 <select id="acao-tipo" onchange="app.checkAcaoTipo()">
                     <option value="" disabled selected>Selecione a ação...</option>
-                    
                     <optgroup label="Lojas e Estabelecimentos">
                         <option>Barbearia</option>
                         <option>Loja de Armamentos</option>
@@ -183,14 +186,12 @@
                         <option>Atom</option>
                         <option>Planet</option>
                     </optgroup>
-
                     <optgroup label="Bancos e Joalheria">
                         <option>Banco Fleeca</option>
                         <option>Banco Central</option>
                         <option>Joalheria</option>
                         <option>Nióbio</option>
                     </optgroup>
-
                     <optgroup label="Rua e Veículos">
                         <option>Ações de Rua (PvP)</option>
                         <option>Fuga Limpa / Teti-Chão</option>
@@ -199,14 +200,12 @@
                         <option>Roubo de Veículos / Porta-malas</option>
                         <option>Recuperação de Veículo</option>
                     </optgroup>
-
                     <optgroup label="Drogas e Roubos Menores">
                         <option>Mesa de Drogas</option>
                         <option>Tráfico de Drogas</option>
                         <option>ATM / Registradora / Residência</option>
                         <option>Caixa de correio</option>
                     </optgroup>
-
                     <optgroup label="Outros e Especiais">
                         <option>Observatório</option>
                         <option>Auditório</option>
@@ -215,7 +214,6 @@
                         <option>Helicrash</option>
                         <option>Sequestro / Refém / Negociação</option>
                     </optgroup>
-
                     <optgroup label="Ações de Férias (Temporário)">
                         <option>Hotel Abandonado</option>
                         <option>Cemitério</option>
@@ -225,14 +223,12 @@
                         <option>Banco de Paleto</option>
                         <option>Aeroporto Abandonado</option>
                     </optgroup>
-
                     <optgroup label="Personalizado">
                         <option value="Outro">Outro (Digitar...)</option>
                     </optgroup>
                 </select>
                 <input type="text" id="acao-tipo-custom" class="hidden mt-15" placeholder="Digite o nome da ação..." autocomplete="off">
             </div>
-            
             <div class="col form-group">
                 <label>Resultado</label>
                 <div class="radio-group">
@@ -274,14 +270,12 @@
                     <option>Atom</option>
                     <option>Planet</option>
                 </optgroup>
-
                 <optgroup label="Bancos e Joalheria">
                     <option>Banco Fleeca</option>
                     <option>Banco Central</option>
                     <option>Joalheria</option>
                     <option>Nióbio</option>
                 </optgroup>
-
                 <optgroup label="Rua e Veículos">
                     <option>Ações de Rua (PvP)</option>
                     <option>Fuga Limpa / Teti-Chão</option>
@@ -290,14 +284,12 @@
                     <option>Roubo de Veículos / Porta-malas</option>
                     <option>Recuperação de Veículo</option>
                 </optgroup>
-
                 <optgroup label="Drogas e Roubos Menores">
                     <option>Mesa de Drogas</option>
                     <option>Tráfico de Drogas</option>
                     <option>ATM / Registradora / Residência</option>
                     <option>Caixa de correio</option>
                 </optgroup>
-
                 <optgroup label="Outros e Especiais">
                     <option>Observatório</option>
                     <option>Auditório</option>
@@ -306,7 +298,6 @@
                     <option>Helicrash</option>
                     <option>Sequestro / Refém / Negociação</option>
                 </optgroup>
-
                 <optgroup label="Ações de Férias (Temporário)">
                     <option>Hotel Abandonado</option>
                     <option>Cemitério</option>
@@ -318,48 +309,7 @@
                 </optgroup>
             </select>
         </div>
-        
         <div id="acao-info-regras" class="hidden"></div>
-    </div>
-</div>
-
-<div id="estatisticas" class="section">
-    <div class="card">
-        <div class="cart-header" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;">
-            <h2 style="margin: 0;">Dashboard (ADMIN)</h2>
-            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <button class="btn btn-small" onclick="app.loadDashboard()" style="padding: 0 15px;">Atualizar</button>
-            </div>
-        </div>
-        <p class="text-muted text-center mb-15 mt-15">As estatísticas locais não estão salvas em nuvem.</p>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Operações Registradas</h3>
-                <div class="stat-number" id="stat-total-vendas">0</div>
-                <div class="stat-desc">Registros na sessão</div>
-            </div>
-            <div class="stat-card">
-                <h3>Total Lavado (Bruto)</h3>
-                <div class="stat-number" id="stat-total-bruto" style="color: #86efac;">R$ 0</div>
-                <div class="stat-desc">Dinheiro Sujo</div>
-            </div>
-            <div class="stat-card highlight">
-                <h3>Lucro Facção (Caixa)</h3>
-                <div class="stat-number" id="stat-faturamento">R$ 0</div>
-                <div class="stat-desc">Limpo pro Baú</div>
-            </div>
-            <div class="stat-card">
-                <h3>Total da Máquina</h3>
-                <div class="stat-number" id="stat-total-maq" style="color: #ef4444;">R$ 0</div>
-                <div class="stat-desc">Separar para Pagamento</div>
-            </div>
-        </div>
-
-        <div class="separator"></div>
-        <div id="stats-top-itens" class="top-list">
-            <p class="text-muted italic text-center">Dashboard desativado (Sistema operando sem Banco de Dados).</p>
-        </div>
     </div>
 </div>
 
@@ -372,7 +322,39 @@ LAVAGEM ON: Não é ficção científica. É só nossa lavagem alienígena mesmo
     </div>
 </div>
 
+<div id="admin-panel" class="section">
+    <div class="card max-w-600 mx-auto">
+        <div class="card-header" style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 20px;">
+            <h2>⚙️ Painel de Controle Admin</h2>
+        </div>
+        
+        <h3 class="text-muted mb-15">🎨 Personalização</h3>
+        <div class="row">
+            <div class="col form-group">
+                <label>Cor Principal do Sistema</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="color" id="admin-color" style="height: 40px; padding: 2px; cursor: pointer; border-radius: 4px; width: 60px; background: var(--bg-input); border: 1px solid var(--border);">
+                    <button class="btn btn-secondary btn-small" onclick="app.resetColor()" style="flex: 1; height: 40px;">Restaurar Padrão</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mt-10">
+            <label>Nome Padrão (Lavador/Responsável)</label>
+            <input type="text" id="admin-default-user" placeholder="Seu nome..." oninput="app.saveDefaultUser(this.value)">
+            <p class="text-sub mt-5">Preenche automaticamente a aba de Registros ao abrir o site.</p>
+        </div>
+
+        <div class="separator"></div>
+
+        <h3 class="text-muted mb-15 mt-20">🛡️ Sistema</h3>
+        <button class="btn btn-outline" style="border-color: var(--danger); color: var(--danger);" onclick="app.hardReset()">
+            ⚠️ Zerar Sistema (Limpar Cache)
+        </button>
+    </div>
+</div>
+
 <div id="toast-container"></div>
-<script src="script.js?v=1.6"></script>
+<script src="script.js?v=1.8"></script>
 </body>
 </html>
