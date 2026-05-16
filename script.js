@@ -1,4 +1,5 @@
 (function() {
+    // Configuração dos Webhooks FIXOS (para que outras pessoas não consigam mexer)
     const CONFIG = {
         WEBHOOKS: {
             ACOES: "https://discord.com/api/webhooks/1500271163090276362/4su-b6yUy4GISMOW_xd9pZfvIzyNYA9b26lAQwmjTbFXw64Q0a2uRg_kNtJmSZvbHlhc",
@@ -15,9 +16,6 @@
         'bau': { name: "Coisas do Baú", type: "pessoal" }
     };
 
-    // =====================================================================
-    // 📜 REGRAS DAS AÇÕES LIDA DO MANUAL OFICIAL
-    // =====================================================================
     const ACTION_DETAILS = {
         "Banco Central": { 
             bandidos: "Obrigatório 10", policia: "Máximo 14", refens: "Máximo 5",
@@ -197,7 +195,6 @@
             extras: "Proibido fingir que existe refém ou ser refém. Obrigatório algemas."
         },
         
-        // --- AÇÕES FÉRIAS ---
         "Hotel Abandonado": {
             bandidos: "4", policia: "5", refens: "Sem reféns",
             armamento: "Pistola",
@@ -246,13 +243,18 @@
             cartao: "Cartão Verde", bgCartao: "#16a34a", textCartao: "#ffffff"
         }
     };
-    // =====================================================================
 
     window.app = {
         state: { participants: new Set(), cart: [], selectedItemId: null, isAdmin: false },
         dom: {},
 
-        init() { this.cacheDOM(); this.setDefaults(); this.renderCatalog(); },
+        init() { 
+            this.cacheDOM(); 
+            this.setDefaults(); 
+            this.renderCatalog(); 
+            this.initTheme(); 
+            this.initAdminSettings(); 
+        },
 
         cacheDOM() {
             const ids = [
@@ -260,10 +262,110 @@
                 'venda-vendedor', 'venda-faccao', 'venda-data', 'venda-hora', 'venda-valor',
                 'sales-catalog', 'price-controls', 'select-msg', 'cart-items', 'cart-summary-area',
                 'cart-production-area', 'mats-list-display', 'sales-production-details',
-                'toast-container', 'stat-total-vendas', 'stat-faturamento', 'stat-total-maq', 'stats-top-itens', 'stat-total-bruto',
-                'filtro-inicio', 'filtro-fim'
+                'toast-container'
             ];
-            ids.forEach(id => this.dom[id] = document.getElementById(id));
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) this.dom[id] = el;
+            });
+        },
+
+        initTheme() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const savedTheme = localStorage.getItem('zigos_theme');
+            
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                if(themeToggle) {
+                    themeToggle.querySelector('.icon-sun').style.display = 'none';
+                    themeToggle.querySelector('.icon-moon').style.display = 'inline';
+                }
+            }
+
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    document.body.classList.toggle('light-mode');
+                    const isLight = document.body.classList.contains('light-mode');
+                    
+                    localStorage.setItem('zigos_theme', isLight ? 'light' : 'dark');
+                    
+                    themeToggle.querySelector('.icon-sun').style.display = isLight ? 'none' : 'inline';
+                    themeToggle.querySelector('.icon-moon').style.display = isLight ? 'inline' : 'none';
+                });
+            }
+        },
+
+        initAdminSettings() {
+            // Carrega Cor
+            const savedColor = localStorage.getItem('zigos_color');
+            const colorPicker = document.getElementById('admin-color');
+            if (savedColor) {
+                this.applyColor(savedColor);
+                if (colorPicker) colorPicker.value = savedColor;
+            } else {
+                if (colorPicker) colorPicker.value = "#106B3A"; 
+            }
+
+            if (colorPicker) {
+                colorPicker.addEventListener('input', (e) => {
+                    this.applyColor(e.target.value);
+                    localStorage.setItem('zigos_color', e.target.value);
+                });
+            }
+
+            // Carrega Nome
+            const savedName = localStorage.getItem('zigos_default_user');
+            if (savedName) {
+                const inputName = document.getElementById('admin-default-user');
+                const vendaName = document.getElementById('venda-vendedor');
+                if (inputName) inputName.value = savedName;
+                if (vendaName) vendaName.value = savedName;
+            }
+        },
+
+        applyColor(hexColor) {
+            // Seta a cor primária
+            document.documentElement.style.setProperty('--primary', hexColor);
+            
+            // Calcula o gradiente escuro
+            let darken = '#' + hexColor.replace(/^#/, '').replace(/../g, color => ('0'+Math.min(255, Math.max(0, parseInt(color, 16) - 40)).toString(16)).substr(-2));
+            document.documentElement.style.setProperty('--primary-dark', darken);
+
+            // MÁGICA DO RGB: Converte a cor Hexadecimal para RGB (R, G, B)
+            let cleanHex = hexColor.replace('#', '');
+            if (cleanHex.length === 3) {
+                cleanHex = cleanHex.split('').map(c => c + c).join('');
+            }
+            let r = parseInt(cleanHex.substring(0,2), 16) || 16;
+            let g = parseInt(cleanHex.substring(2,4), 16) || 107;
+            let b = parseInt(cleanHex.substring(4,6), 16) || 58;
+
+            // Altera a variável mestre do CSS que controla todas as transparências e a FUMAÇA
+            document.documentElement.style.setProperty('--primary-rgb', `${r}, ${g}, ${b}`);
+        },
+
+        resetColor() {
+            localStorage.removeItem('zigos_color');
+            this.applyColor('#106B3A'); // Retorna ao verde padrão e arruma tudo
+            const colorPicker = document.getElementById('admin-color');
+            if (colorPicker) colorPicker.value = "#106B3A";
+            this.showToast("Cor restaurada para o padrão!");
+        },
+
+        saveDefaultUser(name) {
+            localStorage.setItem('zigos_default_user', name);
+            const vendaName = document.getElementById('venda-vendedor');
+            if (vendaName) vendaName.value = name;
+        },
+
+        hardReset() {
+            if(confirm("⚠️ TEM CERTEZA? Isso vai apagar seu tema, sua cor e todos os nomes salvos localmente!")) {
+                localStorage.removeItem('zigos_theme');
+                localStorage.removeItem('zigos_color');
+                localStorage.removeItem('zigos_default_user');
+                alert("Sistema zerado. A página será recarregada.");
+                location.reload();
+            }
         },
 
         setDefaults() {
@@ -275,10 +377,6 @@
                 if (this.dom[`${prefix}-data`]) this.dom[`${prefix}-data`].value = dateStr;
                 if (this.dom[`${prefix}-hora`]) this.dom[`${prefix}-hora`].value = timeStr;
             });
-
-            const firstDayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(now.getFullYear(), now.getMonth(), 1));
-            if (this.dom['filtro-inicio']) this.dom['filtro-inicio'].value = firstDayStr;
-            if (this.dom['filtro-fim']) this.dom['filtro-fim'].value = dateStr;
         },
 
         switchTab(tabId, event) {
@@ -286,7 +384,25 @@
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             if (event) event.currentTarget.classList.add('active');
-            if (tabId === 'estatisticas' && this.state.isAdmin) this.loadDashboard();
+        },
+
+        toggleAdmin() {
+            if (this.state.isAdmin) return;
+            this.state.isAdmin = true;
+            this.showToast("Modo Admin Liberado!", "success");
+            
+            const nav = document.getElementById('nav-menu');
+            const btn = document.createElement('button');
+            btn.className = 'nav-btn';
+            btn.innerText = '⚙️ Admin';
+            btn.id = 'btn-tab-admin';
+            btn.onclick = (e) => app.switchTab('admin-panel', e);
+            nav.appendChild(btn);
+
+            this.switchTab('admin-panel');
+            
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
         },
 
         renderActionRules(actionName, containerId) {
@@ -304,7 +420,6 @@
 
             let cartaoHtml = "";
             if (data.cartao && data.cartao.trim() !== "") {
-                // Removida opacidade ou estilos complexos que poderiam quebrar no FiveM
                 cartaoHtml = `
                 <div style="margin-bottom: 15px; text-align: center;">
                     <span style="display: inline-block; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 14px; text-transform: uppercase; background-color: ${data.bgCartao}; color: ${data.textCartao}; border: 2px solid #ffffff;">
@@ -395,19 +510,6 @@
                 document.getElementById(`${idPrefix}-fac`).innerText = f(res * 0.30);
                 document.getElementById(`${idPrefix}-seu`).innerText = f(seuLucro);
             }
-        },
-
-        toggleAdmin() {
-            if (this.state.isAdmin) return;
-            this.state.isAdmin = true;
-            this.showToast("Modo Admin Ativado!");
-            const nav = document.getElementById('nav-menu');
-            const btn = document.createElement('button');
-            btn.className = 'nav-btn';
-            btn.innerText = 'Estatísticas';
-            btn.onclick = (e) => app.switchTab('estatisticas', e);
-            nav.insertBefore(btn, nav.lastElementChild);
-            this.loadDashboard();
         },
 
         copyAdText(el) { navigator.clipboard.writeText(el.innerText).then(() => this.showToast("Copiado!")); },
@@ -654,10 +756,14 @@
                 return `- ${i.name} | Valor: R$ ${i.val.toLocaleString('pt-BR')}`;
             }).join('\n');
 
+            // Calcula a cor do embed baseada na cor primária selecionada
+            const currentColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+            const embedColor = parseInt(currentColor.replace('#', ''), 16) || 1076026;
+
             const embedVenda = {
                 username: "Zigos",
                 embeds: [{
-                    title: "Lavagem Registrada", color: 1076026,
+                    title: "Lavagem Registrada", color: embedColor,
                     fields: [
                         { name: "Lavador", value: vendedor, inline: true },
                         { name: "Cliente/Origem", value: faccao, inline: true },
@@ -680,15 +786,12 @@
             
             if (CONFIG.WEBHOOKS.LOGS_VENDAS !== "NAO TEM") {
                 this.sendWebhook(CONFIG.WEBHOOKS.LOGS_VENDAS, {
-                    username: "Zigos Log", embeds: [{ color: 1076026, description: `**Cliente:** ${faccao}\n**Operações:**\n${itensFormatados}\n**Data:** ${this.formatDate(dataInput)} às ${horaInput}` }]
+                    username: "Zigos Log", embeds: [{ color: embedColor, description: `**Cliente:** ${faccao}\n**Operações:**\n${itensFormatados}\n**Data:** ${this.formatDate(dataInput)} às ${horaInput}` }]
                 });
             }
-        }, 
-
-        loadDashboard() {
-            this.dom['stats-top-itens'].innerHTML = '<p class="text-muted italic text-center">Dashboard desativado (Sistema operando sem Banco de Dados).</p>';
         }
     };
 
     document.addEventListener('DOMContentLoaded', () => window.app.init());
+
 })();
