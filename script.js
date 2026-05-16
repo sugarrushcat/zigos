@@ -23,7 +23,7 @@
 
         cacheDOM() {
             const ids = [
-                'acao-tipo', 'acao-data', 'acao-hora', 'novo-participante', 'lista-participantes',
+                'acao-tipo', 'acao-tipo-custom', 'acao-data', 'acao-hora', 'novo-participante', 'lista-participantes',
                 'venda-vendedor', 'venda-faccao', 'venda-data', 'venda-hora', 'venda-valor',
                 'sales-catalog', 'price-controls', 'select-msg', 'cart-items', 'cart-summary-area',
                 'cart-production-area', 'mats-list-display', 'sales-production-details',
@@ -54,6 +54,18 @@
             document.getElementById(tabId).classList.add('active');
             if (event) event.currentTarget.classList.add('active');
             if (tabId === 'estatisticas' && this.state.isAdmin) this.loadDashboard();
+        },
+
+        // --- CONTROLA O CAMPO DA AÇÃO CUSTOMIZADA ---
+        checkAcaoTipo() {
+            const select = this.dom['acao-tipo'];
+            const customInput = this.dom['acao-tipo-custom'];
+            if (select && select.value === 'Outro') {
+                customInput.classList.remove('hidden');
+                customInput.focus();
+            } else if (customInput) {
+                customInput.classList.add('hidden');
+            }
         },
 
         maskCurrency(e) {
@@ -93,7 +105,7 @@
                 document.getElementById(`${idPrefix}-com`).innerText = f(comissaoUser);
                 document.getElementById(`${idPrefix}-cli`).innerText = f(v * wt.pCli);
             } else {
-                let maq = v * 0.20; // Ajustado para 20%
+                let maq = v * 0.20; 
                 let res = v - maq;
                 let seuLucro = res * 0.70;
                 document.getElementById(`${idPrefix}-maq`).innerText = f(maq);
@@ -170,7 +182,7 @@
                 cliente = val * wt.pCli;
                 fac = caixa; 
             } else {
-                maq = val * 0.20; // Ajustado para 20%
+                maq = val * 0.20; 
                 let res = val - maq;
                 fac = res * 0.30;
                 cliente = res * 0.70;
@@ -299,7 +311,14 @@
         },
 
         sendActionWebhook() {
-            const tipo = this.dom['acao-tipo'].value.trim();
+            // Se o usuário selecionou 'Outro', pega o valor da caixinha escondida
+            let tipo = this.dom['acao-tipo'].value;
+            if (tipo === 'Outro') {
+                tipo = this.dom['acao-tipo-custom'].value.trim();
+            } else {
+                tipo = tipo.trim();
+            }
+
             const dataF_input = this.dom['acao-data'].value.trim();
             const hora = this.dom['acao-hora'].value.trim();
             const resultado = document.querySelector('input[name="resultado"]:checked')?.value;
