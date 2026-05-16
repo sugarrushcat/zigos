@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>Painel Zigos - Gestão</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.0">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22 fill=%22%23106B3A%22 font-family=%22sans-serif%22 font-weight=%22bold%22>ZIG</text></svg>">
 </head>
 <body>
 
 <header>
     <div class="header-top">
-        <h1>Painel Zigos</h1>
+        <h1>Painel Zigos <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal; vertical-align: middle; letter-spacing: 0;">v1.0</span></h1>
         <div class="header-controls">
             <div id="btn-admin-secret" class="system-status" onclick="app.toggleAdmin()" title="Clique para liberar acesso Admin">
                 <span class="status-dot"></span> Sistema Online
@@ -113,3 +113,172 @@
                 <div class="wash-item"><span>Lucro</span><b id="w35-luc">R$ 0,00</b></div>
                 <div class="wash-item"><span>Caixa</span><b id="w35-cax">R$ 0,00</b></div>
                 <div class="wash-item"><span>Comissão</span><b id="w35-com">R$ 0,00</b></div>
+                <div class="wash-item highlight"><span>Cliente</span><b id="w35-cli">R$ 0,00</b></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="color: var(--primary); text-transform: uppercase; margin-bottom: 15px; text-align: center;">Lavagem 40%</h3>
+            <div class="form-group">
+                <label>Valor para Lavar (R$)</label>
+                <input type="text" id="w40-input" placeholder="Ex: 1.000.000" oninput="app.maskCurrency(event); app.calcWash('40')">
+                <div id="w40-mats" class="wash-mats-info">Materiais: 0 Papel | 0 Tinta</div>
+            </div>
+            <div class="wash-results">
+                <div class="wash-item"><span>Máquina</span><b id="w40-maq">R$ 0,00</b></div>
+                <div class="wash-item"><span>Lucro</span><b id="w40-luc">R$ 0,00</b></div>
+                <div class="wash-item"><span>Caixa</span><b id="w40-cax">R$ 0,00</b></div>
+                <div class="wash-item"><span>Comissão</span><b id="w40-com">R$ 0,00</b></div>
+                <div class="wash-item highlight"><span>Cliente</span><b id="w40-cli">R$ 0,00</b></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="color: var(--success); text-transform: uppercase; margin-bottom: 15px; text-align: center;">Lavagem Pessoal</h3>
+            <div class="form-group">
+                <label>Valor (R$)</label>
+                <input type="text" id="wp-input" placeholder="Ex: 1.000.000" oninput="app.maskCurrency(event); app.calcWash('pers')">
+                <div id="wp-mats" class="wash-mats-info">Materiais: 0 Papel | 0 Tinta</div>
+            </div>
+            <div class="wash-results">
+                <div class="wash-item"><span>Máquina</span><b id="wp-maq">R$ 0,00</b></div>
+                <div class="wash-item"><span>Resultado</span><b id="wp-res">R$ 0,00</b></div>
+                <div class="wash-item"><span>Facção</span><b id="wp-fac">R$ 0,00</b></div>
+                <div class="wash-item highlight"><span>Seu Lucro</span><b id="wp-seu">R$ 0,00</b></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="color: var(--success); text-transform: uppercase; margin-bottom: 15px; text-align: center;">Coisas do Baú</h3>
+            <div class="form-group">
+                <label>Valor (R$)</label>
+                <input type="text" id="wbau-input" placeholder="Ex: 1.000.000" oninput="app.maskCurrency(event); app.calcWash('bau')">
+                <div id="wbau-mats" class="wash-mats-info">Materiais: 0 Papel | 0 Tinta</div>
+            </div>
+            <div class="wash-results">
+                <div class="wash-item"><span>Máquina</span><b id="wbau-maq">R$ 0,00</b></div>
+                <div class="wash-item"><span>Resultado</span><b id="wbau-res">R$ 0,00</b></div>
+                <div class="wash-item"><span>Facção</span><b id="wbau-fac">R$ 0,00</b></div>
+                <div class="wash-item highlight"><span>Seu Lucro</span><b id="wbau-seu">R$ 0,00</b></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="estatisticas" class="section">
+    <div class="card">
+        <div class="cart-header" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;">
+            <h2 style="margin: 0;">Dashboard (ADMIN)</h2>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <input type="date" id="filtro-inicio" style="padding: 8px; width: auto; font-size: 0.85rem;">
+                <span class="text-muted">até</span>
+                <input type="date" id="filtro-fim" style="padding: 8px; width: auto; font-size: 0.85rem;">
+                <button class="btn btn-small" onclick="app.loadDashboard()" style="padding: 0 15px;">Filtrar</button>
+            </div>
+        </div>
+        <p class="text-muted text-center mb-15 mt-15">As estatísticas locais não estão salvas em nuvem.</p>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Operações Registradas</h3>
+                <div class="stat-number" id="stat-total-vendas">0</div>
+                <div class="stat-desc">Registros na sessão</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Lavado (Bruto)</h3>
+                <div class="stat-number" id="stat-total-bruto" style="color: #86efac;">R$ 0</div>
+                <div class="stat-desc">Dinheiro Sujo</div>
+            </div>
+            <div class="stat-card highlight">
+                <h3>Lucro Facção (Caixa)</h3>
+                <div class="stat-number" id="stat-faturamento">R$ 0</div>
+                <div class="stat-desc">Limpo pro Baú</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total da Máquina</h3>
+                <div class="stat-number" id="stat-total-maq" style="color: #ef4444;">R$ 0</div>
+                <div class="stat-desc">Separar para Pagamento</div>
+            </div>
+        </div>
+
+        <div class="separator"></div>
+        <div id="stats-top-itens" class="top-list">
+            <p class="text-muted italic text-center">Dashboard desativado (Sistema operando sem Banco de Dados).</p>
+        </div>
+    </div>
+</div>
+
+<div id="acoes" class="section">
+    <div class="card">
+        <div class="card-header"><h2>Registro de Ação</h2></div>
+        <div class="row">
+            <div class="col form-group">
+                <label>Local da Ação</label>
+                <select id="acao-tipo" onchange="app.checkAcaoTipo()">
+                    <option value="" disabled selected>Selecione...</option>
+                    <option>Barbearia</option>
+                    <option>Loja de Armas</option>
+                    <option>Loja de Departamento</option>
+                    <option>Banco Fleeca</option>
+                    <option>Açougue</option>
+                    <option>Banco Central</option>
+                    <option>Observatório</option>
+                    <option>Auditório</option>
+                    <option>Mergulhador</option>
+                    <option>Atom</option>
+                    <option>Campo de Golf</option>
+                    <option>Loja Samir</option>
+                    <option>Planet</option>
+                    <option>Pacific Standard</option>
+                    <option>Nióbio</option>
+                    <option>Joalheria</option>
+                    <option>Helicrash</option>
+                    <option>Mesa de Drogas</option>
+                    <option>Ação de Rua (PvP)</option>
+                    <option value="Outro">Outro (Digitar...)</option>
+                </select>
+                <input type="text" id="acao-tipo-custom" class="hidden mt-15" placeholder="Digite o nome da ação..." autocomplete="off">
+            </div>
+            <div class="col form-group">
+                <label>Resultado</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="resultado" value="Vitória"><div class="radio-label label-win">Vitória</div></label>
+                    <label><input type="radio" name="resultado" value="Derrota"><div class="radio-label label-loss">Derrota</div></label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col form-group"><label>Data</label><input type="date" id="acao-data"></div>
+            <div class="col form-group"><label>Horário</label><input type="time" id="acao-hora"></div>
+        </div>
+        <div class="form-group">
+            <label>Participantes</label>
+            <div class="input-group" id="group-participantes">
+                <input type="text" id="novo-participante" placeholder="Nome/ID e Enter..." autocomplete="off" onkeypress="app.handleEnterParticipant(event)">
+                <button class="btn btn-small" type="button" onclick="app.addParticipant()">Add</button>
+            </div>
+            <div id="lista-participantes" class="participants-list"></div>
+        </div>
+        <button class="btn btn-primary" onclick="app.sendActionWebhook()">Enviar Registro (Discord)</button>
+    </div>
+</div>
+
+<div id="divulgacao" class="section">
+    <div class="card max-w-600 mx-auto">
+        <h2>Central de Anúncios</h2>
+        <div class="copy-card" onclick="app.copyAdText(this)">
+            [LAVANDERIA ABERTA]
+
+            Lave seu dinheiro com a melhor taxa da cidade!
+
+            Chama no canal > Zigos
+        </div>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+<img src="gatinho.gif" alt="Mascote Gatinho" class="site-mascot">
+
+<script src="script.js?v=1.0"></script>
+</body>
+</html>
