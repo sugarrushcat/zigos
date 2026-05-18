@@ -75,13 +75,14 @@
             this.initRuleFavorites();
             this.initRecentActions();
             this.bindRuleEvents();
+            this.registerServiceWorker();
             await this.loadActionData();
         },
 
         cacheDOM() {
             const ids = [
                 "acao-tipo", "acao-search", "acao-action-list", "acao-empty", "acao-show-all", "acao-helper", "acao-selected-display", "acao-data", "acao-hora", "novo-participante", "participant-action-list", "participant-empty", "lista-participantes",
-                "venda-vendedor", "venda-faccao", "venda-data", "venda-hora", "venda-valor",
+                "venda-vendedor", "seller-action-list", "seller-empty", "venda-faccao", "venda-data", "venda-hora", "venda-valor",
                 "sales-catalog", "price-controls", "select-msg", "cart-items", "cart-summary-area",
                 "cart-production-area", "mats-list-display", "sales-production-details",
                 "toast-container", "regras-acao-tipo", "regras-search", "regras-favorites",
@@ -185,11 +186,28 @@
                 });
             }
 
+            if (this.dom["venda-vendedor"]) {
+                this.dom["venda-vendedor"].addEventListener("input", (event) => {
+                    this.renderSellerSuggestions(event.target.value);
+                });
+            }
+
             if (this.dom["regras-acao-tipo"]) {
                 this.dom["regras-acao-tipo"].addEventListener("change", () => {
                     this.checkRegrasTipo();
                 });
             }
+        },
+
+        registerServiceWorker() {
+            if (!("serviceWorker" in navigator)) return;
+            if (!window.isSecureContext) return;
+
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./service-worker.js").catch((error) => {
+                    console.error("Falha ao registrar service worker", error);
+                });
+            });
         },
 
         async loadActionData() {
@@ -203,6 +221,7 @@
                 this.renderActionSelectOptions();
                 this.renderActionPicker();
                 this.renderParticipantSuggestions();
+                this.renderSellerSuggestions();
                 this.renderRulesExplorer();
                 return;
             }
@@ -221,6 +240,7 @@
                 this.renderActionSelectOptions();
                 this.renderActionPicker();
                 this.renderParticipantSuggestions();
+                this.renderSellerSuggestions();
                 this.renderRulesExplorer();
             } catch (error) {
                 console.error(error);
@@ -326,7 +346,11 @@
         switchTab(tabId, event) {
             document.querySelectorAll(".section").forEach((section) => section.classList.remove("active"));
             document.querySelectorAll(".nav-btn").forEach((button) => button.classList.remove("active"));
-            document.getElementById(tabId).classList.add("active");
+            const nextSection = document.getElementById(tabId);
+            nextSection.classList.add("active");
+            nextSection.classList.remove("animate-in");
+            void nextSection.offsetWidth;
+            nextSection.classList.add("animate-in");
             if (event) event.currentTarget.classList.add("active");
         },
 
@@ -389,6 +413,8 @@
             if (selectedDisplay) {
                 selectedDisplay.textContent = this.state.selectedActionName || "Nenhuma ação selecionada.";
             }
+
+            this.applyStaggerAnimation(listContainer, ".rule-action-card");
         },
 
         renderActionOptionCard(name) {
@@ -460,6 +486,9 @@
             }
 
             emptyState.style.display = shouldShowAll && !filteredNames.length ? "block" : "none";
+            this.applyStaggerAnimation(listContainer, ".rule-action-card");
+            if (favoritesContainer) this.applyStaggerAnimation(favoritesContainer, ".favorite-chip");
+            if (recentContainer) this.applyStaggerAnimation(recentContainer, ".favorite-chip");
         },
 
         renderFavoriteChip(name) {
@@ -633,6 +662,19 @@
             return `${participant.passaporte} - ${participant.nome}`;
         },
 
+        findParticipantMatches(filterText = "") {
+            const query = filterText.trim();
+            const normalizedQuery = this.normalizeText(query);
+            if (!query) return [];
+
+            return PARTICIPANT_PRESETS.filter((participant) => {
+                const fullLabel = this.getParticipantLabel(participant);
+                return participant.passaporte.includes(query)
+                    || this.normalizeText(participant.nome).includes(normalizedQuery)
+                    || this.normalizeText(fullLabel).includes(normalizedQuery);
+            }).slice(0, 8);
+        },
+
         renderParticipantSuggestions(filterText = "") {
             const container = this.dom["participant-action-list"];
             const emptyState = this.dom["participant-empty"];
@@ -647,12 +689,7 @@
                 return;
             }
 
-            const matches = PARTICIPANT_PRESETS.filter((participant) => {
-                const fullLabel = this.getParticipantLabel(participant);
-                return participant.passaporte.includes(query)
-                    || this.normalizeText(participant.nome).includes(normalizedQuery)
-                    || this.normalizeText(fullLabel).includes(normalizedQuery);
-            }).slice(0, 8);
+            const matches = this.findParticipantMatches(query);
 
             container.innerHTML = matches.map((participant) => this.renderParticipantCard(participant)).join("");
 
@@ -661,6 +698,52 @@
             }
 
             emptyState.style.display = matches.length ? "none" : "block";
+            this.applyStaggerAnimation(container, ".participant-card");
+        },
+
+        renderSellerSuggestions(filterText = "") {
+            const container = this.dom["seller-action-list"];
+            const emptyState = this.dom["seller-empty"];
+            if (!container || !emptyState) return;
+
+            const query = filterText.trim();
+
+            if (!query) {
+                container.innerHTML = "";
+                emptyState.style.display = "none";
+                return;
+            }
+
+            const matches = this.findParticipantMatches(query);
+            container.innerHTML = matches.map((participant) => this.renderSellerCard(participant)).join("");
+
+            emptyState.style.display = matches.length ? "none" : "block";
+            this.applyStaggerAnimation(container, ".participant-card");
+        },
+
+        renderSellerCard(participant) {
+            const value = this.getParticipantLabel(participant);
+            const currentValue = this.dom["venda-vendedor"] ? this.dom["venda-vendedor"].value.trim() : "";
+            const isActive = currentValue === value ? " active" : "";
+            return `
+                <button class="participant-card${isActive}" type="button" onclick="app.selectSeller('${this.escapeForSingleQuote(value)}')">
+                    <div class="participant-card-main">
+                        <strong>${participant.nome}</strong>
+                        <span>Passaporte ${participant.passaporte}</span>
+                    </div>
+                    <span class="participant-card-tag">Usar</span>
+                </button>
+            `;
+        },
+
+        selectSeller(value, clearList = true) {
+            const cleanValue = value.trim();
+            if (!cleanValue || !this.dom["venda-vendedor"]) return;
+            this.dom["venda-vendedor"].value = cleanValue;
+            if (clearList && this.dom["seller-action-list"] && this.dom["seller-empty"]) {
+                this.dom["seller-action-list"].innerHTML = "";
+                this.dom["seller-empty"].style.display = "none";
+            }
         },
 
         renderParticipantCard(participant) {
@@ -760,7 +843,20 @@
             toast.className = `toast ${type}`;
             toast.innerText = msg;
             this.dom["toast-container"].appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            setTimeout(() => {
+                toast.classList.add("closing");
+                setTimeout(() => toast.remove(), 250);
+            }, 2750);
+        },
+
+        applyStaggerAnimation(container, selector) {
+            if (!container) return;
+            const items = container.querySelectorAll(selector);
+            if (!items.length) return;
+            container.classList.add("stagger-list");
+            items.forEach((item, index) => {
+                item.style.animationDelay = `${Math.min(index * 45, 220)}ms`;
+            });
         },
 
         formatDate(dateValue) {
@@ -780,6 +876,7 @@
             });
             htmlBuffer += "</div>";
             this.dom["sales-catalog"].innerHTML = htmlBuffer;
+            this.applyStaggerAnimation(this.dom["sales-catalog"], ".catalog-item");
         },
 
         selectItem(id) {
@@ -980,6 +1077,7 @@
                 html += `<div class="chip">${participant} <span onclick="app.removeParticipant('${this.escapeForSingleQuote(participant)}')">&times;</span></div>`;
             });
             this.dom["lista-participantes"].innerHTML = html;
+            this.applyStaggerAnimation(this.dom["lista-participantes"], ".chip");
         },
 
         handleEnterParticipant(e) {

@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>Painel Zigos - Gestão</title>
+    <meta name="theme-color" content="#106B3A">
+    <meta name="application-name" content="Painel Zigos">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icon-192.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon-192.svg">
     <link rel="stylesheet" href="style.css?v=1.8">
 </head>
 <body>
@@ -18,7 +23,7 @@
                 <span class="icon-moon" style="display: none;">🌙</span>
             </button>
             <div id="btn-admin-secret" class="system-status" onclick="app.toggleAdmin()" title="Clique para liberar acesso Admin">
-                <span class="status-dot"></span> Sistema Online
+                <span class="status-dot"></span> Alterar Cores
             </div>
         </div>
     </div>
@@ -38,7 +43,7 @@
             <div class="card">
                 <h2>Registrar Lavagem</h2>
                 <div class="row" id="area-vendedor-info">
-                    <div class="col form-group"><label>Lavador / Responsável</label><input type="text" id="venda-vendedor" placeholder="Seu Nome..." autocomplete="off"></div>
+                    <div class="col form-group"><label>Lavador / Responsável</label><input type="text" id="venda-vendedor" placeholder="Digite passaporte ou nome..." autocomplete="off"><div id="seller-action-list" class="participant-suggestion-list mt-15"></div><p id="seller-empty" class="rules-helper-text" style="display: none;">Nenhum nome encontrado.</p></div>
                     <div class="col form-group"><label>Cliente / Origem do Dinheiro</label><input type="text" id="venda-faccao" placeholder="Nome/Facção..." autocomplete="off"></div>
                 </div>
                 <div class="row">
