@@ -1,9 +1,9 @@
-const CACHE_NAME = "painel-zigos-v1";
+const CACHE_NAME = "painel-zigos-v1.9";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
-  "./style.css?v=1.8",
-  "./script.js?v=1.8",
+  "./style.css?v=1.9",
+  "./script.js?v=1.9",
   "./actions-data.js?v=1.0",
   "./actions.json?v=1.0",
   "./manifest.webmanifest",
