@@ -1,10 +1,10 @@
-const CACHE_NAME = "painel-zigos-v1.9";
+const CACHE_NAME = "painel-zigos-v2.0";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
-  "./style.css?v=1.9",
-  "./script.js?v=1.9",
-  "./actions-data.js?v=1.0",
+  "./style.css?v=2.0",
+  "./script.js?v=2.0",
+  "./actions-data.js?v=2.0",
   "./actions.json?v=1.0",
   "./manifest.webmanifest",
   "./icon-192.svg",
@@ -41,10 +41,15 @@ self.addEventListener("fetch", (event) => {
           if (!networkResponse || networkResponse.status !== 200) return networkResponse;
 
           const responseClone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+
           return networkResponse;
         })
-        .catch(() => caches.match("./index.html"));
+        .catch(() => {
+          // Fallback silencioso em caso de erro de rede
+        });
     })
   );
 });
