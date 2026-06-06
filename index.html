@@ -81,7 +81,15 @@
 
                 <div id="cart-summary-area"></div>
                 
-                <button class="btn btn-primary mt-20 btn-glow" onclick="app.sendSaleWebhook()">
+                <div class="mt-15 mb-20" style="padding-top: 10px;">
+                    <button class="btn" id="btn-toggle-desconto" style="background: linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(239,68,68,0.05) 100%); border: 2px solid var(--danger); color: var(--danger); font-weight: 800; font-size: 1.05rem; text-shadow: 0 0 10px rgba(239,68,68,0.5); box-shadow: 0 0 15px rgba(239,68,68,0.2); border-radius: 12px; padding: 16px; width: 100%; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; justify-content: center; align-items: center; gap: 12px;" onclick="app.toggleDiscount()">
+                        <span id="icone-desconto" style="font-size: 1.3rem;">⭕</span> 
+                        <span id="texto-desconto">LAVAGEM C/ DESCONTO: OFF</span>
+                    </button>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 10px; text-align: center; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Regra: Máquina -5% | Cliente +5% (Lucro Intacto)</div>
+                </div>
+
+                <button class="btn btn-primary mt-10 btn-glow" onclick="app.sendSaleWebhook()">
                     FINALIZAR E REGISTRAR
                 </button>
 
@@ -111,7 +119,7 @@
 <div id="lavagem" class="section">
     <div class="wash-grid-container">
         <div class="card">
-            <h3 style="color: var(--primary); text-transform: uppercase; margin-bottom: 15px; text-align: center;">Lavagem 35%</h3>
+            <h3 style="color: var(--primary); text-transform: uppercase; margin-bottom: 15px; text-align: center;">Lavagem Parceria</h3>
             <div class="form-group">
                 <label>Valor para Lavar (R$)</label>
                 <input type="text" id="w35-input" placeholder="Ex: 1.000.000" oninput="app.maskCurrency(event); app.calcWash('35')">
@@ -127,7 +135,7 @@
         </div>
 
         <div class="card">
-            <h3 style="color: var(--primary); text-transform: uppercase; margin-bottom: 15px; text-align: center;">Lavagem 40%</h3>
+            <h3 style="color: var(--primary); text-transform: uppercase; margin-bottom: 15px; text-align: center;">Lavagem Pista</h3>
             <div class="form-group">
                 <label>Valor para Lavar (R$)</label>
                 <input type="text" id="w40-input" placeholder="Ex: 1.000.000" oninput="app.maskCurrency(event); app.calcWash('40')">
@@ -154,21 +162,6 @@
                 <div class="wash-item"><span>Resultado</span><b id="wp-res">R$ 0,00</b></div>
                 <div class="wash-item"><span>Facção</span><b id="wp-fac">R$ 0,00</b></div>
                 <div class="wash-item highlight"><span>Seu Lucro</span><b id="wp-seu">R$ 0,00</b></div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h3 style="color: var(--success); text-transform: uppercase; margin-bottom: 15px; text-align: center;">Coisas do Baú</h3>
-            <div class="form-group">
-                <label>Valor (R$)</label>
-                <input type="text" id="wbau-input" placeholder="Ex: 1.000.000" oninput="app.maskCurrency(event); app.calcWash('bau')">
-                <div id="wbau-mats" class="wash-mats-info">Materiais: 0 Papel | 0 Tinta</div>
-            </div>
-            <div class="wash-results">
-                <div class="wash-item"><span>Máquina</span><b id="wbau-maq">R$ 0,00</b></div>
-                <div class="wash-item"><span>Resultado</span><b id="wbau-res">R$ 0,00</b></div>
-                <div class="wash-item"><span>Facção</span><b id="wbau-fac">R$ 0,00</b></div>
-                <div class="wash-item highlight"><span>Seu Lucro</span><b id="wbau-seu">R$ 0,00</b></div>
             </div>
         </div>
     </div>

@@ -22,10 +22,9 @@ document.addEventListener('keydown', function(e) {
     };
 
     const WASH_TYPES = {
-        "35": { name: "Lavagem 35%", type: "padrao", pMaq: 0.20, pLuc: 0.15, pCli: 0.65 },
-        "40": { name: "Lavagem 40%", type: "padrao", pMaq: 0.20, pLuc: 0.20, pCli: 0.60 },
-        "pers": { name: "Lavagem Pessoal", type: "pessoal" },
-        "bau": { name: "Coisas do Baú", type: "pessoal" }
+        "35": { name: "Lavagem Parceria", type: "padrao", pMaq: 0.20, pLuc: 0.15, pCli: 0.65 },
+        "40": { name: "Lavagem Pista", type: "padrao", pMaq: 0.20, pLuc: 0.20, pCli: 0.60 },
+        "pers": { name: "Lavagem Pessoal", type: "pessoal" }
     };
 
     const ACTIONS_JSON_PATH = "./actions.json?v=1.0";
@@ -75,7 +74,8 @@ document.addEventListener('keydown', function(e) {
             allActionNames: [],
             selectedActionName: "",
             showAllActionOptions: false,
-            selectedParticipantValue: ""
+            selectedParticipantValue: "",
+            discountOn: false
         },
         dom: {},
 
@@ -795,10 +795,77 @@ document.addEventListener('keydown', function(e) {
             this.addParticipant(isManual ? cleanValue : cleanValue);
         },
 
-        checkRegrasTipo() {
-            const select = this.dom["regras-acao-tipo"];
-            if (select && select.value) {
-                this.selectRuleAction(select.value);
+        // --- FUNÇÃO CORAÇÃO DA MATEMÁTICA ---
+        recalcItemMath(item) {
+            const washType = WASH_TYPES[item.id];
+            
+            if (washType.type === "padrao") {
+                let pMaq = washType.pMaq;
+                let pCli = washType.pCli;
+
+                // Lógica de Desconto: -5% Máquina, +5% Cliente (Sua comissão e Facção ficam intactos)
+                if (this.state.discountOn) {
+                    pMaq -= 0.05;
+                    pCli += 0.05;
+                }
+
+                const lucroTotal = item.val * washType.pLuc;
+                item.maq = item.val * pMaq;
+                item.cliente = item.val * pCli;
+                item.comissao_lav = lucroTotal * 0.30; 
+                item.fac = lucroTotal * 0.70;          
+                item.caixa = item.fac;
+            } else {
+                item.maq = item.val * 0.20;
+                const resultado = item.val - item.maq;
+                item.fac = 0;
+                item.cliente = 0; 
+                item.comissao_lav = resultado; 
+                item.caixa = 0;
+            }
+            
+            item.mats = Math.ceil((item.val / 100000) * 11);
+        },
+
+        toggleDiscount() {
+            this.state.discountOn = !this.state.discountOn;
+            const btn = document.getElementById('btn-toggle-desconto');
+            const icon = document.getElementById('icone-desconto');
+            const text = document.getElementById('texto-desconto');
+
+            // Troca a aparência do botão com efeitos brilhosos
+            if (this.state.discountOn) {
+                if (btn) {
+                    btn.style.borderColor = 'var(--success)';
+                    btn.style.color = 'var(--success)';
+                    btn.style.background = 'linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.05) 100%)';
+                    btn.style.boxShadow = '0 0 20px rgba(16,185,129,0.3)';
+                    btn.style.textShadow = '0 0 10px rgba(16,185,129,0.5)';
+                }
+                if (icon) icon.innerText = '✅';
+                if (text) text.innerText = 'LAVAGEM C/ DESCONTO: ON';
+            } else {
+                if (btn) {
+                    btn.style.borderColor = 'var(--danger)';
+                    btn.style.color = 'var(--danger)';
+                    btn.style.background = 'linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(239,68,68,0.05) 100%)';
+                    btn.style.boxShadow = '0 0 15px rgba(239,68,68,0.2)';
+                    btn.style.textShadow = '0 0 10px rgba(239,68,68,0.5)';
+                }
+                if (icon) icon.innerText = '⭕';
+                if (text) text.innerText = 'LAVAGEM C/ DESCONTO: OFF';
+            }
+
+            // Atualiza inputs da aba calculadora se tiver algo lá
+            if (document.getElementById('w35-input')?.value) this.calcWash('35');
+            if (document.getElementById('w40-input')?.value) this.calcWash('40');
+            if (document.getElementById('wp-input')?.value) this.calcWash('pers');
+
+            // ATUALIZA O CARRINHO AUTOMATICAMENTE
+            if (this.state.cart.length > 0) {
+                this.state.cart.forEach(item => this.recalcItemMath(item));
+                this.renderCart();
+                this.showToast(this.state.discountOn ? "Desconto aplicado ao carrinho!" : "Desconto removido do carrinho!", this.state.discountOn ? "success" : "error");
             }
         },
 
@@ -820,7 +887,7 @@ document.addEventListener('keydown', function(e) {
 
         calcWash(type) {
             const formatMoney = (value) => "R$ " + value.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            const idPrefix = ["35", "40"].includes(type) ? `w${type}` : (type === "pers" ? "wp" : "wbau");
+            const idPrefix = ["35", "40"].includes(type) ? `w${type}` : "wp";
 
             const value = this.getNumericValue(`${idPrefix}-input`);
             const mats = Math.ceil((value / 100000) * 11);
@@ -829,20 +896,32 @@ document.addEventListener('keydown', function(e) {
 
             if (["35", "40"].includes(type)) {
                 const washType = WASH_TYPES[type];
+                let pMaq = washType.pMaq;
+                let pCli = washType.pCli;
+
+                if (this.state.discountOn) {
+                    pMaq -= 0.05;
+                    pCli += 0.05;
+                }
+
                 const lucroTotal = value * washType.pLuc;
+                const maq = value * pMaq;
+                const cliente = value * pCli;
                 const comissaoUser = lucroTotal * 0.30;
-                document.getElementById(`${idPrefix}-maq`).innerText = formatMoney(value * washType.pMaq);
+                const caixaFac = lucroTotal * 0.70;
+
+                document.getElementById(`${idPrefix}-maq`).innerText = formatMoney(maq);
                 document.getElementById(`${idPrefix}-luc`).innerText = formatMoney(lucroTotal);
-                document.getElementById(`${idPrefix}-cax`).innerText = formatMoney(lucroTotal * 0.70);
+                document.getElementById(`${idPrefix}-cax`).innerText = formatMoney(caixaFac);
                 document.getElementById(`${idPrefix}-com`).innerText = formatMoney(comissaoUser);
-                document.getElementById(`${idPrefix}-cli`).innerText = formatMoney(value * washType.pCli);
-            } else {
+                document.getElementById(`${idPrefix}-cli`).innerText = formatMoney(cliente);
+            } else if (type === "pers") {
                 const maq = value * 0.20;
                 const resultado = value - maq;
-                const seuLucro = resultado * 0.70;
+                const seuLucro = resultado; 
                 document.getElementById(`${idPrefix}-maq`).innerText = formatMoney(maq);
                 document.getElementById(`${idPrefix}-res`).innerText = formatMoney(resultado);
-                document.getElementById(`${idPrefix}-fac`).innerText = formatMoney(resultado * 0.30);
+                document.getElementById(`${idPrefix}-fac`).innerText = formatMoney(0);
                 document.getElementById(`${idPrefix}-seu`).innerText = formatMoney(seuLucro);
             }
         },
@@ -900,6 +979,17 @@ document.addEventListener('keydown', function(e) {
             this.dom["select-msg"].style.display = "none";
             this.dom["venda-valor"].value = "";
             this.dom["venda-valor"].focus();
+
+            // CONVERSÃO AUTOMÁTICA DO CARRINHO PARA A NOVA OPÇÃO CLICADA
+            if (this.state.cart.length > 0) {
+                this.state.cart.forEach(item => {
+                    item.id = id;
+                    item.name = WASH_TYPES[id].name;
+                    this.recalcItemMath(item);
+                });
+                this.renderCart();
+                this.showToast(`Itens no carrinho alterados para ${WASH_TYPES[id].name}!`, "success");
+            }
         },
 
         addToCart() {
@@ -909,43 +999,20 @@ document.addEventListener('keydown', function(e) {
             const val = this.getNumericValue("venda-valor");
             if (val <= 0) return this.showToast("Digite um valor válido", "error");
 
-            const washType = WASH_TYPES[id];
-            let maq = 0;
-            let lucro = 0;
-            let caixa = 0;
-            let comissaoLav = 0;
-            let cliente = 0;
-            let fac = 0;
-
-            if (washType.type === "padrao") {
-                maq = val * washType.pMaq;
-                lucro = val * washType.pLuc;
-                caixa = lucro * 0.70;
-                comissaoLav = lucro * 0.30;
-                cliente = val * washType.pCli;
-                fac = caixa;
-            } else {
-                maq = val * 0.20;
-                const resultado = val - maq;
-                fac = resultado * 0.30;
-                cliente = resultado * 0.70;
-                comissaoLav = cliente;
-                caixa = fac;
-            }
-
-            const mats = Math.ceil((val / 100000) * 11);
-
-            this.state.cart.push({
+            const newItem = {
                 id,
-                name: washType.name,
+                name: WASH_TYPES[id].name,
                 val,
-                maq,
-                caixa,
-                comissao_lav: comissaoLav,
-                cliente,
-                fac,
-                mats
-            });
+                maq: 0,
+                caixa: 0,
+                comissao_lav: 0,
+                cliente: 0,
+                fac: 0,
+                mats: 0
+            };
+
+            this.recalcItemMath(newItem);
+            this.state.cart.push(newItem);
 
             this.dom["venda-valor"].value = "";
             this.renderCart();
