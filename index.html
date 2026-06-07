@@ -4,93 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <title>Painel Zigos - Gestão</title>
-    <meta name="theme-color" content="#106B3A">
+    <title>Painel Zigos — Gestão v2.0</title>
+    <meta name="theme-color" content="#00ffaa">
     <meta name="application-name" content="Painel Zigos">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="icon-192.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="icon-192.svg">
-    <link rel="stylesheet" href="style.css?v=2.0">
+    <link rel="stylesheet" href="style.css?v=3.0">
 </head>
 <body>
 
 <header>
     <div class="header-top">
-        <h1>Painel Zigos <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal; vertical-align: middle; letter-spacing: 0;">v2.0</span></h1>
+        <h1>Zigos</h1>
         <div class="header-controls">
-            <button id="theme-toggle" class="theme-btn" title="Alternar Tema" style="background: none; border: none; cursor: pointer; font-size: 1.2rem; margin-right: 15px;">
+            <button id="theme-toggle" class="theme-btn" title="Alternar Tema">
                 <span class="icon-sun">☀️</span>
-                <span class="icon-moon" style="display: none;">🌙</span>
+                <span class="icon-moon" style="display:none;">🌙</span>
             </button>
-            <div id="btn-admin-secret" class="system-status" onclick="app.toggleAdmin()" title="Clique para liberar acesso Admin">
-                <span class="status-dot"></span> Alterar Cores
+            <div id="btn-admin-secret" class="system-status" onclick="app.toggleAdmin()" title="Acesso Admin">
+                <span class="status-dot"></span> SYS ONLINE
             </div>
         </div>
     </div>
 
     <nav class="nav-tabs" id="nav-menu">
-        <button class="nav-btn active" onclick="app.switchTab('vendas', event)">Registrar</button>
-        <button class="nav-btn" onclick="app.switchTab('lavagem', event)">Calculadora</button>
-        <button class="nav-btn" onclick="app.switchTab('acoes', event)">Ações</button>
-        <button class="nav-btn" onclick="app.switchTab('regras', event)">Regras</button>
-        <button class="nav-btn" onclick="app.switchTab('divulgacao', event)">Divulgação</button>
+        <button class="nav-btn active" onclick="app.switchTab('vendas', event)">⬡ Registrar</button>
+        <button class="nav-btn" onclick="app.switchTab('lavagem', event)">⬡ Calc.</button>
+        <button class="nav-btn" onclick="app.switchTab('acoes', event)">⬡ Ações</button>
+        <button class="nav-btn" onclick="app.switchTab('regras', event)">⬡ Regras</button>
+        <button class="nav-btn" onclick="app.switchTab('divulgacao', event)">⬡ Divulg.</button>
     </nav>
 </header>
 
+<!-- ====== ABA REGISTRAR ====== -->
 <div id="vendas" class="section active">
     <div class="row">
         <div class="col">
             <div class="card">
                 <h2>Registrar Lavagem</h2>
+
                 <div class="row" id="area-vendedor-info">
-                    <div class="col form-group"><label>Lavador / Responsável</label><input type="text" id="venda-vendedor" placeholder="Digite passaporte ou nome..." autocomplete="off"><div id="seller-action-list" class="participant-suggestion-list mt-15"></div><p id="seller-empty" class="rules-helper-text" style="display: none;">Nenhum nome encontrado.</p></div>
-                    <div class="col form-group"><label>Cliente / Origem do Dinheiro</label><input type="text" id="venda-faccao" placeholder="Nome/Facção..." autocomplete="off"></div>
+                    <div class="col form-group">
+                        <label>Lavador / Responsável</label>
+                        <input type="text" id="venda-vendedor" placeholder="Passaporte ou nome..." autocomplete="off">
+                        <div id="seller-action-list" class="participant-suggestion-list mt-15"></div>
+                        <p id="seller-empty" class="rules-helper-text" style="display:none;">Nenhum nome encontrado.</p>
+                    </div>
+                    <div class="col form-group">
+                        <label>Cliente / Origem</label>
+                        <input type="text" id="venda-faccao" placeholder="Nome / Facção..." autocomplete="off">
+                    </div>
                 </div>
+
                 <div class="row">
-                    <div class="col form-group"><label>Data</label><input type="date" id="venda-data"></div>
-                    <div class="col form-group"><label>Horário</label><input type="time" id="venda-hora"></div>
+                    <div class="col form-group">
+                        <label>Data</label>
+                        <input type="date" id="venda-data">
+                    </div>
+                    <div class="col form-group">
+                        <label>Horário</label>
+                        <input type="time" id="venda-hora">
+                    </div>
                 </div>
 
                 <hr class="separator">
 
                 <div class="form-group">
-                    <label>SELECIONE A OPERAÇÃO:</label>
+                    <label>Selecione a Operação</label>
                     <div id="sales-catalog" class="catalog-container"></div>
                 </div>
 
                 <div id="price-controls" class="hidden-controls">
                     <div class="row">
-                        <div class="col form-group"><label>Valor a Lavar (R$)</label><input type="text" id="venda-valor" placeholder="Ex: 1.000.000" oninput="app.maskCurrency(event)"></div>
+                        <div class="col form-group">
+                            <label>Valor a Lavar (R$)</label>
+                            <input type="text" id="venda-valor" placeholder="Ex: 1.000.000" oninput="app.maskCurrency(event)">
+                        </div>
                     </div>
-                    <button class="btn btn-outline" id="btn-add-cart" onclick="app.addToCart()">+ ADICIONAR AO CARRINHO</button>
+                    <button class="btn btn-outline" id="btn-add-cart" onclick="app.addToCart()">+ Adicionar ao Carrinho</button>
                 </div>
-                <div id="select-msg" class="text-center text-muted italic mt-15">Selecione uma operação acima...</div>
+                <div id="select-msg" class="text-center text-muted italic mt-15" style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;letter-spacing:1px;">Selecione uma operação acima...</div>
             </div>
         </div>
 
         <div class="col">
             <div class="card card-cart" id="area-carrinho">
                 <div class="cart-header">
-                    <h2>Carrinho de Lavagem</h2>
-                    <button class="btn-clear" onclick="app.clearCart()">Limpar</button>
+                    <h2 style="margin-bottom:0;">Carrinho</h2>
+                    <button class="btn-clear" onclick="app.clearCart()">⌫ Limpar</button>
                 </div>
-                
+
                 <div id="cart-items" class="cart-body">
-                    <p class="empty-msg">Nenhuma operação adicionada</p>
+                    <p class="empty-msg">— Nenhuma operação —</p>
                 </div>
 
                 <div id="cart-summary-area"></div>
-                
+
                 <div class="mt-15 mb-20" style="padding-top: 10px;">
-                    <button class="btn" id="btn-toggle-desconto" style="background: linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(239,68,68,0.05) 100%); border: 2px solid var(--danger); color: var(--danger); font-weight: 800; font-size: 1.05rem; text-shadow: 0 0 10px rgba(239,68,68,0.5); box-shadow: 0 0 15px rgba(239,68,68,0.2); border-radius: 12px; padding: 16px; width: 100%; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; justify-content: center; align-items: center; gap: 12px;" onclick="app.toggleDiscount()">
-                        <span id="icone-desconto" style="font-size: 1.3rem;">⭕</span> 
+                    <button class="btn" id="btn-toggle-desconto"
+                        style="background: linear-gradient(135deg, rgba(244,63,94,0.12) 0%, rgba(244,63,94,0.04) 100%); border: 2px solid var(--danger); color: var(--danger); font-weight: 800; font-size: 1rem; text-shadow: 0 0 12px rgba(244,63,94,0.4); box-shadow: 0 0 20px rgba(244,63,94,0.15); border-radius: 14px; padding: 15px; width: 100%; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 12px;"
+                        onclick="app.toggleDiscount()">
+                        <span id="icone-desconto" style="font-size:1rem; font-family:'Share Tech Mono',monospace;">[ ]</span>
                         <span id="texto-desconto">LAVAGEM C/ DESCONTO: OFF</span>
                     </button>
-                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 10px; text-align: center; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Regra: Máquina -5% | Cliente +5% (Lucro Intacto)</div>
+                    <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-top:8px;text-align:center;letter-spacing:1.5px;text-transform:uppercase;">Máquina -5% | Cliente +5% — Lucro intacto</div>
                 </div>
 
                 <button class="btn btn-primary mt-10 btn-glow" onclick="app.sendSaleWebhook()">
-                    FINALIZAR E REGISTRAR
+                    ✓ Finalizar e Registrar
                 </button>
 
                 <div class="mt-30 border-top pt-20" id="area-producao">
@@ -101,25 +123,23 @@
                     <div id="cart-production-area" class="production-summary-box hidden mt-20">
                         <div class="prod-box-header">
                             <h3 class="summary-title-styled">Resumo de Materiais</h3>
-                            <button class="btn-close-box" onclick="app.closeProduction()">X</button>
+                            <button class="btn-close-box" onclick="app.closeProduction()">✕</button>
                         </div>
-                        
                         <div id="mats-list-display" class="tags-container mb-15"></div>
-                        
-                        <h4 class="text-muted text-center mb-10 text-sub uppercase">Custo por Operação:</h4>
+                        <h4 style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);text-align:center;margin-bottom:10px;letter-spacing:2px;text-transform:uppercase;">Custo por Operação</h4>
                         <div id="sales-production-details" class="flex-column gap-10"></div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
 
+<!-- ====== ABA CALCULADORA ====== -->
 <div id="lavagem" class="section">
     <div class="wash-grid-container">
         <div class="card">
-            <h3 style="color: var(--primary); text-transform: uppercase; margin-bottom: 15px; text-align: center;">Lavagem Parceria</h3>
+            <h3 style="color:var(--accent);text-transform:uppercase;margin-bottom:16px;text-align:center;font-family:'Rajdhani',sans-serif;letter-spacing:2px;font-size:1rem;">Lavagem Parceria</h3>
             <div class="form-group">
                 <label>Valor para Lavar (R$)</label>
                 <input type="text" id="w35-input" placeholder="Ex: 1.000.000" oninput="app.maskCurrency(event); app.calcWash('35')">
@@ -130,12 +150,12 @@
                 <div class="wash-item"><span>Lucro</span><b id="w35-luc">R$ 0,00</b></div>
                 <div class="wash-item"><span>Caixa</span><b id="w35-cax">R$ 0,00</b></div>
                 <div class="wash-item"><span>Comissão</span><b id="w35-com">R$ 0,00</b></div>
-                <div class="wash-item highlight"><span>Cliente</span><b id="w35-cli">R$ 0,00</b></div>
+                <div class="wash-item highlight"><span>Cliente Recebe</span><b id="w35-cli">R$ 0,00</b></div>
             </div>
         </div>
 
         <div class="card">
-            <h3 style="color: var(--primary); text-transform: uppercase; margin-bottom: 15px; text-align: center;">Lavagem Pista</h3>
+            <h3 style="color:var(--accent);text-transform:uppercase;margin-bottom:16px;text-align:center;font-family:'Rajdhani',sans-serif;letter-spacing:2px;font-size:1rem;">Lavagem Pista</h3>
             <div class="form-group">
                 <label>Valor para Lavar (R$)</label>
                 <input type="text" id="w40-input" placeholder="Ex: 1.000.000" oninput="app.maskCurrency(event); app.calcWash('40')">
@@ -146,12 +166,12 @@
                 <div class="wash-item"><span>Lucro</span><b id="w40-luc">R$ 0,00</b></div>
                 <div class="wash-item"><span>Caixa</span><b id="w40-cax">R$ 0,00</b></div>
                 <div class="wash-item"><span>Comissão</span><b id="w40-com">R$ 0,00</b></div>
-                <div class="wash-item highlight"><span>Cliente</span><b id="w40-cli">R$ 0,00</b></div>
+                <div class="wash-item highlight"><span>Cliente Recebe</span><b id="w40-cli">R$ 0,00</b></div>
             </div>
         </div>
 
         <div class="card">
-            <h3 style="color: var(--success); text-transform: uppercase; margin-bottom: 15px; text-align: center;">Lavagem Pessoal</h3>
+            <h3 style="color:var(--success);text-transform:uppercase;margin-bottom:16px;text-align:center;font-family:'Rajdhani',sans-serif;letter-spacing:2px;font-size:1rem;">Lavagem Pessoal</h3>
             <div class="form-group">
                 <label>Valor (R$)</label>
                 <input type="text" id="wp-input" placeholder="Ex: 1.000.000" oninput="app.maskCurrency(event); app.calcWash('pers')">
@@ -161,73 +181,93 @@
                 <div class="wash-item"><span>Máquina</span><b id="wp-maq">R$ 0,00</b></div>
                 <div class="wash-item"><span>Resultado</span><b id="wp-res">R$ 0,00</b></div>
                 <div class="wash-item"><span>Facção</span><b id="wp-fac">R$ 0,00</b></div>
-                <div class="wash-item highlight"><span>Seu Lucro</span><b id="wp-seu">R$ 0,00</b></div>
+                <div class="wash-item highlight" style="border-color:rgba(var(--accent-rgb),0.3);background:rgba(var(--accent-rgb),0.07);">
+                    <span>Seu Lucro</span><b id="wp-seu" style="color:var(--accent);text-shadow:0 0 15px rgba(var(--accent-rgb),0.4);">R$ 0,00</b>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- ====== ABA AÇÕES ====== -->
 <div id="acoes" class="section">
     <div class="card">
-        <div class="card-header"><h2>Registro de Ação</h2></div>
+        <h2>Registro de Ação</h2>
+
         <div class="form-group">
             <label>Buscar Ação</label>
             <input type="text" id="acao-search" placeholder="Digite o nome da ação..." autocomplete="off">
         </div>
+
         <div class="action-picker-wrap">
             <div class="rules-headline-row">
                 <h3>Resultados</h3>
                 <button id="acao-show-all" class="btn-mini-ghost" type="button" onclick="app.toggleShowAllActions()">Mostrar todas</button>
             </div>
-            <p id="acao-helper" class="rules-helper-text">Digite para filtrar ou abra a lista completa só quando precisar.</p>
+            <p id="acao-helper" class="rules-helper-text">// Digite para filtrar ou abra a lista completa.</p>
             <div id="acao-action-list" class="rule-action-list"></div>
-            <p id="acao-empty" class="empty-msg" style="display: none;">Nenhuma ação encontrada com esse filtro.</p>
+            <p id="acao-empty" class="empty-msg" style="display:none;">Nenhuma ação encontrada.</p>
         </div>
+
         <div class="action-picker-wrap">
             <div class="rules-headline-row">
                 <h3>Ação Selecionada</h3>
-                <span class="rules-headline-sub">Clique em uma ação da lista para preencher o registro.</span>
+                <span class="rules-headline-sub">Clique em uma ação para preencher.</span>
             </div>
-            <div id="acao-selected-display" class="selected-action-display">Nenhuma ação selecionada.</div>
+            <div id="acao-selected-display" class="selected-action-display">— Nenhuma ação selecionada —</div>
         </div>
+
         <select id="acao-tipo" class="hidden">
             <option value="" disabled selected>Selecione a ação...</option>
         </select>
+
         <div class="form-group">
             <label>Resultado</label>
             <div class="radio-group">
-                <label><input type="radio" name="resultado" value="Vitória"><div class="radio-label label-win">Vitória</div></label>
-                <label><input type="radio" name="resultado" value="Derrota"><div class="radio-label label-loss">Derrota</div></label>
+                <label><input type="radio" name="resultado" value="Vitória"><div class="radio-label label-win">▲ Vitória</div></label>
+                <label><input type="radio" name="resultado" value="Derrota"><div class="radio-label label-loss">▼ Derrota</div></label>
             </div>
         </div>
+
         <div class="row">
-            <div class="col form-group"><label>Data</label><input type="date" id="acao-data"></div>
-            <div class="col form-group"><label>Horário</label><input type="time" id="acao-hora"></div>
+            <div class="col form-group">
+                <label>Data</label>
+                <input type="date" id="acao-data">
+            </div>
+            <div class="col form-group">
+                <label>Horário</label>
+                <input type="time" id="acao-hora">
+            </div>
         </div>
+
         <div class="form-group">
             <label>Participantes</label>
-            <input type="text" id="novo-participante" placeholder="Digite passaporte ou nome..." autocomplete="off" onkeypress="app.handleEnterParticipant(event)">
+            <input type="text" id="novo-participante" placeholder="Passaporte ou nome..." autocomplete="off" onkeypress="app.handleEnterParticipant(event)">
             <div id="participant-action-list" class="participant-suggestion-list mt-15"></div>
-            <p id="participant-empty" class="rules-helper-text" style="display: none;">Nenhum participante encontrado. Use a opção manual abaixo.</p>
-            <button class="btn btn-secondary mt-15" type="button" onclick="app.addParticipant()">Adicionar Manualmente</button>
+            <p id="participant-empty" class="rules-helper-text" style="display:none;">Nenhum encontrado. Use a opção abaixo.</p>
+            <button class="btn btn-secondary mt-15" type="button" onclick="app.addParticipant()">+ Adicionar Manualmente</button>
             <div id="lista-participantes" class="participants-list"></div>
         </div>
-        <button class="btn btn-primary" onclick="app.sendActionWebhook()">Enviar Registro</button>
+
+        <button class="btn btn-primary" onclick="app.sendActionWebhook()">
+            ✓ Enviar Registro
+        </button>
     </div>
 </div>
 
+<!-- ====== ABA REGRAS ====== -->
 <div id="regras" class="section">
-    <div class="card max-w-600 mx-auto" style="margin-bottom: 25px;">
-        <h2 style="margin-bottom: 20px; color: var(--primary); text-align: center;">Consultar Regras da Ação</h2>
-        <p class="text-center text-muted mb-15 text-sub">Busque, filtre e salve favoritos para consultar rápido perímetro, limites e cartões de acesso.</p>
+    <div class="card max-w-600 mx-auto" style="margin-bottom:25px;">
+        <h2>Consultar Regras</h2>
+        <p style="font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--text-dim);text-align:center;margin-bottom:22px;letter-spacing:1px;">// Perímetro, limites e cartões de acesso por ação</p>
 
         <div class="rules-toolbar">
             <div class="form-group mb-15">
-                <label>Busca rápida</label>
-                <input type="text" id="regras-search" placeholder="Digite o nome da ação..." autocomplete="off">
+                <label>Busca Rápida</label>
+                <input type="text" id="regras-search" placeholder="Nome da ação..." autocomplete="off">
             </div>
             <div class="form-group mb-15">
-                <label>Escolha direta</label>
+                <label>Escolha Direta</label>
                 <select id="regras-acao-tipo">
                     <option value="" disabled selected>Escolha uma ação...</option>
                 </select>
@@ -236,16 +276,16 @@
 
         <div class="rules-favorites-wrap">
             <div class="rules-headline-row">
-                <h3>Favoritos</h3>
-                <span class="rules-headline-sub">As ações que você mais usa ficam guardadas aqui.</span>
+                <h3>⭐ Favoritos</h3>
+                <span class="rules-headline-sub">Ações salvas para acesso rápido.</span>
             </div>
             <div id="regras-favorites" class="favorite-chip-list"></div>
         </div>
 
         <div class="rules-favorites-wrap">
             <div class="rules-headline-row">
-                <h3>Recentes</h3>
-                <span class="rules-headline-sub">Consultas recentes para abrir mais rápido.</span>
+                <h3>◷ Recentes</h3>
+                <span class="rules-headline-sub">Consultas recentes.</span>
             </div>
             <div id="regras-recent" class="favorite-chip-list"></div>
         </div>
@@ -255,52 +295,56 @@
                 <h3>Resultados</h3>
                 <button id="regras-show-all" class="btn-mini-ghost" type="button" onclick="app.toggleShowAllRules()">Mostrar todas</button>
             </div>
-            <p id="regras-helper" class="rules-helper-text">Digite para buscar uma ação ou use os favoritos e recentes. A lista completa fica recolhida para não poluir a tela.</p>
+            <p id="regras-helper" class="rules-helper-text">// Digite para buscar ou use os favoritos e recentes.</p>
             <div id="regras-action-list" class="rule-action-list"></div>
-            <p id="regras-empty" class="empty-msg" style="display: none;">Nenhuma ação encontrada com esse filtro.</p>
+            <p id="regras-empty" class="empty-msg" style="display:none;">Nenhuma ação encontrada.</p>
         </div>
 
         <div id="acao-info-regras" class="hidden"></div>
     </div>
 </div>
 
+<!-- ====== ABA DIVULGAÇÃO ====== -->
 <div id="divulgacao" class="section">
     <div class="card max-w-600 mx-auto">
         <h2>Central de Anúncios</h2>
+        <p style="font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--text-dim);margin-bottom:22px;letter-spacing:1px;">// Clique no card para copiar o texto</p>
         <div class="copy-card" onclick="app.copyAdText(this)">
 LAVAGEM ON: Não é ficção científica. É só nossa lavagem alienígena mesmo. 🧼🚀 >> Area51 <<
         </div>
     </div>
 </div>
 
+<!-- ====== ADMIN PANEL ====== -->
 <div id="admin-panel" class="section">
     <div class="card max-w-600 mx-auto">
-        <div class="card-header" style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 20px;">
-            <h2>⚙️ Painel de Controle Admin</h2>
+        <div class="card-header" style="border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:22px;">
+            <h2>Painel Admin</h2>
         </div>
-        
-        <h3 class="text-muted mb-15">Personalização</h3>
+
+        <h3 style="font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">// Personalização</h3>
+
         <div class="row">
             <div class="col form-group">
                 <label>Cor Principal do Sistema</label>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="color" id="admin-color" style="height: 40px; padding: 2px; cursor: pointer; border-radius: 4px; width: 60px; background: var(--bg-input); border: 1px solid var(--border);">
-                    <button class="btn btn-secondary btn-small" onclick="app.resetColor()" style="flex: 1; height: 40px;">Restaurar Padrão</button>
+                <div style="display:flex;gap:10px;align-items:center;">
+                    <input type="color" id="admin-color" style="height:42px;padding:3px;cursor:pointer;border-radius:6px;width:60px;background:var(--bg-input);border:1px solid var(--border);">
+                    <button class="btn btn-secondary btn-small" onclick="app.resetColor()" style="flex:1;height:42px;">Restaurar Padrão</button>
                 </div>
             </div>
         </div>
 
         <div class="form-group mt-10">
-            <label>Nome Padrão (Lavador/Responsável)</label>
+            <label>Nome Padrão (Lavador)</label>
             <input type="text" id="admin-default-user" placeholder="Seu nome..." oninput="app.saveDefaultUser(this.value)">
-            <p class="text-sub mt-5">Preenche automaticamente a aba de Registros ao abrir o site.</p>
+            <p class="text-sub mt-5" style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;letter-spacing:0.5px;">Preenche automaticamente ao abrir o Registrar.</p>
         </div>
 
-        <div class="separator"></div>
+        <hr class="separator">
 
-        <h3 class="text-muted mb-15 mt-20">Sistema</h3>
-        <button class="btn btn-outline" style="border-color: var(--danger); color: var(--danger);" onclick="app.hardReset()">
-             Zerar Sistema (Limpar Cor)
+        <h3 style="font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">// Sistema</h3>
+        <button class="btn btn-outline" style="border-color:var(--danger);color:var(--danger);" onclick="app.hardReset()">
+            Zerar Sistema
         </button>
     </div>
 </div>

@@ -842,7 +842,7 @@ document.addEventListener('keydown', function(e) {
                     btn.style.boxShadow = '0 0 20px rgba(16,185,129,0.3)';
                     btn.style.textShadow = '0 0 10px rgba(16,185,129,0.5)';
                 }
-                if (icon) icon.innerText = '✅';
+                if (icon) icon.innerText = '[X]';
                 if (text) text.innerText = 'LAVAGEM C/ DESCONTO: ON';
             } else {
                 if (btn) {
@@ -852,7 +852,7 @@ document.addEventListener('keydown', function(e) {
                     btn.style.boxShadow = '0 0 15px rgba(239,68,68,0.2)';
                     btn.style.textShadow = '0 0 10px rgba(239,68,68,0.5)';
                 }
-                if (icon) icon.innerText = '⭕';
+                if (icon) icon.innerText = '[ ]';
                 if (text) text.innerText = 'LAVAGEM C/ DESCONTO: OFF';
             }
 
